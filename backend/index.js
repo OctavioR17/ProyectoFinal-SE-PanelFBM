@@ -31,11 +31,18 @@ async function main(data) {
     try{
         console.log(data);
 
+        const sesionid = await client.query(
+            'SELECT max(sesion.id) FROM sesion \
+                JOIN usuario ON usuarioid = usuario.id \
+                WHERE usuario.nombre LIKE $1', [data.nombre]
+                );
+        const sesion = sesionid.rows[0].max;
+
         //const result = await client.query('SELECT * FROM test');
         const result = await client.query(
-            'INSERT INTO test (fecha, temperatura, humedad) \
-                VALUES ($1, $2, $3)', 
-                [fecha, data.temperatura, data.humedad]
+            'INSERT INTO monitoreo (hora, intensidadled, oxigenacion, pulso, temperatura, sesionid) \
+                VALUES ($1, $2, $3, $4, $5, $6)', 
+                [fecha, data.intensidadled, data.oxigenacion, data.pulso, data.temperatura, sesion]
         );
 
         console.log(result.rows);
