@@ -1,12 +1,44 @@
 const http = require('http');
+const { Client } = require('pg');
+require('dotenv').config();
 
 const hostname = '0.0.0.0';
 const port = 3000;
 
+const client = new Client({
+    user: process.env.DB_USER,
+    host: process.env.DB_HOST,
+    database: process.env.DB_DATABASE,
+    password: process.env.DB_PASSWORD,
+    port: process.env.DB_PORT,
+});
+
+client.connect();
+
 async function main(data) {
+    const fecha = new Date().toLocaleString('en-US', 
+        { 
+            year: 'numeric', 
+            month: '2-digit', 
+            day: '2-digit', 
+            hour: '2-digit', 
+            minute: '2-digit', 
+            second: '2-digit', 
+            hour12: false 
+        }
+    );
+    console.log(fecha);
     try{
         console.log(data);
 
+        //const result = await client.query('SELECT * FROM test');
+        const result = await client.query(
+            'INSERT INTO test (fecha, temperatura, humedad) \
+                VALUES ($1, $2, $3)', 
+                [fecha, data.temperatura, data.humedad]
+        );
+
+        console.log(result.rows);
     } catch (error) {
         console.error("Encountered an error: ", error);
     }
@@ -15,7 +47,6 @@ async function main(data) {
 
 const server = http.createServer((req, res) => {
     console.log("\nRecibiendo peticion...");
-    console.log(new Date().toLocaleString());
     if (req.method === 'POST' && req.headers['content-type'] === 'application/json') {
         let body = '';
         req.on('data', chunk => {
@@ -36,4 +67,9 @@ const server = http.createServer((req, res) => {
 
 server.listen(port, hostname, () => {
     console.log(`Server running at http://${hostname}:${port}/`);
+});
+
+process.on('exit', () => {
+    client.end();
+    console.log("Client disconnected");
 });
