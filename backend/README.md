@@ -1,0 +1,2 @@
+# In windows
+Deactivate firewall
