@@ -78,8 +78,8 @@ void enviarDatos() {
 
   StaticJsonDocument<200> doc;
 
-  doc["humidity"] = 117; // reemplazar por la lectura del sensor
-  doc["temperature"] = 343; //// reemplazar por la lectura del sensor
+  doc["humedad"] = 117; // reemplazar por la lectura del sensor
+  doc["temperatura"] = 343; //// reemplazar por la lectura del sensor
   
   char jsonBuffer[512];
   serializeJson(doc, jsonBuffer);
