@@ -2,6 +2,7 @@ const http = require('http');
 const { Client } = require('pg');
 require('dotenv').config();
 
+
 const hostname = '0.0.0.0';
 const port = 3000;
 
@@ -13,7 +14,7 @@ const client = new Client({
     port: process.env.DB_PORT,
 });
 
-client.connect();
+//client.connect();
 
 async function main(data) {
     const fecha = new Date().toLocaleString('en-US', 
@@ -53,6 +54,13 @@ async function main(data) {
 
 
 const server = http.createServer((req, res) => {
+
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*'); // Or '*' for any origin
+    res.setHeader('Access-Control-Allow-Methods', '*');
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+    res.setHeader('Access-Control-Allow-Credentials', true);
+
     console.log("\nRecibiendo peticion...");
     if (req.method === 'POST' && req.headers['content-type'] === 'application/json') {
         let body = '';
@@ -64,11 +72,21 @@ const server = http.createServer((req, res) => {
             res.end('JSON received and printed');
             main(data);
         });
-    } else {
+    } else if (req.method === 'GET') {
         res.statusCode = 200;
-        res.setHeader('Content-Type', 'text/plain');
-        res.end('Hello, World!');
-        console.log("Hello, World!");
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({
+        id: 1,
+        date: new Date().toISOString(),
+        value1: 'Value 1',
+        value2: 'Value 2',
+        value3: 'Value 3'
+        }));
+        console.log("Data sent!");
+    } else {
+        res.statusCode = 404;
+        res.end('Not Found');
+        console.log("Not Found");
     }
 });
 
