@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fotobiomodulación</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f9;
+        color: #333;
+        margin: 0;
+        padding: 0;
+      }
+
+      h1 {
+        text-align: center;
+        margin-top: 20px;
+      }
+
+      #led-control {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 20px;
+      }
+
+      #controls,
+      #password-container,
+      #slider-controls,
+      #sensor-data,
+      #info-pain-relief,
+      #info-tissue-treatment,
+      #info-hair-growth,
+      #table-container {
+        margin: 20px 0;
+      }
+
+      #controls button,
+      #password-container button,
+      #show-table-button,
+      #table-container button {
+        padding: 10px 20px;
+        margin: 5px;
+        border: none;
+        background-color: #007bff;
+        color: white;
+        cursor: pointer;
+        border-radius: 5px;
+      }
+
+      #controls button:hover,
+      #password-container button:hover,
+      #show-table-button:hover,
+      #table-container button:hover {
+        background-color: #0056b3;
+      }
+
+      #password-input {
+        padding: 10px;
+        margin-right: 5px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+      }
+
+      #manual-control {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+      }
+
+      #slider-controls {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+      }
+
+      .slider-container {
+        margin: 10px 0;
+        width: 80%;
+      }
+
+      .slider-label {
+        display: block;
+        margin-bottom: 5px;
+        text-align: center;
+      }
+
+      .slider {
+        width: 100%;
+      }
+
+      #timer-container,
+      #message {
+        text-align: center;
+        margin: 20px;
+      }
+
+      #cancel {
+        background-color: #dc3545;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+      }
+
+      #cancel:hover {
+        background-color: #c82333;
+      }
+
+      #sensor-data {
+        text-align: center;
+        margin: 20px;
+      }
+
+      #sensor-data div {
+        margin: 10px 0;
+      }
+
+      .calor {
+        color: red;
+      }
+
+      .frio {
+        color: blue;
+      }
+
+      #info-control {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 20px;
+      }
+
+      #info-control div {
+        margin: 10px 0;
+        text-align: center;
+      }
+
+      #table-container {
+        display: none;
+        width: 80%;
+        margin: 0 auto;
+      }
+
+      #records-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      #records-table th,
+      #records-table td {
+        padding: 10px;
+        text-align: center;
+        border: 1px solid #ccc;
+      }
+
+      #records-table th {
+        background-color: #007bff;
+        color: white;
+      }
+
+      #records-table tbody tr:nth-child(even) {
+        background-color: #f4f4f9;
+      }
+
+      #records-table tbody tr:nth-child(odd) {
+        background-color: #fff;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Sistemas Embebidos - Fotobiomodulación</h1>
+    <div id="led-control">
+      <h2>Bienvenido</h2>
+      <h3 id="paragraph">
+        Selecciona cualquiera de las opciones para comenzar con la sesión
+      </h3>
+      <div id="controls">
+        <button id="btn1" onclick="sendData('button1')">Botón 1</button>
+        <button id="btn2" onclick="sendData('button2')">Botón 2</button>
+        <button id="btn3" onclick="sendData('button3')">Botón 3</button>
+        <button id="btn4" onclick="sendData('button4')">Botón 4</button>
+        <button id="btn5" onclick="sendData('button5')">Botón 5</button>
+      </div>
+      <div id="password-container">
+        <input
+          type="password"
+          id="password-input"
+          placeholder="Introduce la contraseña"
+        />
+        <button id="password-button" onclick="checkPassword()">
+          Control Manual
+        </button>
+      </div>
+      <div id="manual-control" style="display: none;">
+        <div id="slider-controls">
+          <div class="slider-container">
+            <label for="slider1" class="slider-label">Intensidad</label>
+            <input
+              type="range"
+              id="slider1"
+              class="slider"
+              min="0"
+              max="100"
+              value="50"
+              oninput="sendSliderData()"
+            />
+          </div>
+          <div class="slider-container">
+            <label for="slider2" class="slider-label">Duración</label>
+            <input
+              type="range"
+              id="slider2"
+              class="slider"
+              min="0"
+              max="60"
+              value="30"
+              oninput="sendSliderData()"
+            />
+          </div>
+          <div class="slider-container">
+            <label for="slider3" class="slider-label">Frecuencia</label>
+            <input
+              type="range"
+              id="slider3"
+              class="slider"
+              min="1"
+              max="10"
+              value="5"
+              oninput="sendSliderData()"
+            />
+          </div>
+        </div>
+        <button id="show-table-button" onclick="showTable()">Mostrar Registros</button>
+      </div>
+      <div id="timer-container">
+        <div><strong>Tiempo restante de la sesión</strong></div>
+        <div id="timer"></div>
+      </div>
+      <button
+        id="cancel"
+        onclick="cancelTimer()"
+        style="
+          background-color: #dc3545;
+          display: none;
+          margin: 0 auto;
+          align-self: center;
+        "
+      >
+        Terminar con la sesión
+      </button>
+      <div id="message">La sesión ha terminado</div>
+    </div>
+    <div id="info-control">
+      <div id="sensor-data">
+        <div>
+          <strong>Temperatura: </strong
+          ><span id="valor-temperatura">-- °C</span>
+        </div>
+        <div>
+          <strong>Oxigenación: </strong
+          ><span id="valor-oxigenacion">-- %</span>
+        </div>
+        <div>
+          <strong>Ritmo Cardíaco: </strong
+          ><span id="valor-ritmo-cardiaco">-- bpm</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="table-container" style="display: none;">
+      <h2>Registros</h2>
+      <table id="records-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Fecha</th>
+            <th>Valor 1</th>
+            <th>Valor 2</th>
+            <th>Valor 3</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Filas de datos se insertarán aquí -->
+        </tbody>
+      </table>
+      <button onclick="hideTable()">Volver</button>
+    </div>
+
+    <script>
+      const correctPassword = "12345"; // Contraseña correcta
+      const esp32Ip = "http://192.168.1.1"; 
+
+      function checkPassword() {
+        const inputPassword = document.getElementById("password-input").value;
+        if (inputPassword === correctPassword) {
+          document.getElementById("manual-control").style.display = "flex";
+        } else {
+          alert("Contraseña incorrecta");
+        }
+      }
+
+      function sendData(button) {
+        fetch(`${esp32Ip}/${button}`, {
+          method: "GET",
+        })
+          .then((response) => response.text())
+          .then((data) => console.log(data))
+          .catch((error) => console.error("Error:", error));
+      }
+
+      function sendSliderData() {
+        const intensity = document.getElementById("slider1").value;
+        const duration = document.getElementById("slider2").value;
+        const frequency = document.getElementById("slider3").value;
+
+        const url = `${esp32Ip}/slider?intensity=${intensity}&duration=${duration}&frequency=${frequency}`;
+
+        fetch(url, {
+          method: "GET",
+        })
+          .then((response) => response.text())
+          .then((data) => console.log(data))
+          .catch((error) => console.error("Error:", error));
+      }
+
+      let timer;
+      let countdown;
+
+      function confirmStart(duration, infoId) {
+        if (confirm("¿Deseas iniciar la sesión?")) {
+          startTimer(duration);
+          document.getElementById(infoId).style.display = "block";
+          document.getElementById("cancel").style.display = "block";
+          document.getElementById("message").style.display = "none";
+        }
+      }
+
+      function startTimer(duration) {
+        let timerDisplay = document.getElementById("timer");
+        let time = duration * 60;
+        clearInterval(countdown);
+        document.getElementById("timer-container").style.display = "block";
+        countdown = setInterval(() => {
+          let minutes = Math.floor(time / 60);
+          let seconds = time % 60;
+          timerDisplay.innerHTML =
+            (minutes < 10 ? "0" : "") +
+            minutes +
+            ":" +
+            (seconds < 10 ? "0" : "") +
+            seconds;
+          time--;
+          if (time < 0) {
+            clearInterval(countdown);
+            document.getElementById("message").style.display = "block";
+            document.getElementById("timer-container").style.display = "none";
+            document.getElementById("cancel").style.display = "none";
+          }
+        }, 1000);
+      }
+
+      function cancelTimer() {
+        clearInterval(countdown);
+        document.getElementById("timer-container").style.display = "none";
+        document.getElementById("cancel").style.display = "none";
+        document.getElementById("message").style.display = "none";
+      }
+
+      function updateSensors() {
+        const tempElement = document.getElementById("valor-temperatura");
+        const oxigenacionElement = document.getElementById("valor-oxigenacion");
+        const ritmoElement = document.getElementById("valor-ritmo-cardiaco");
+
+        const temperatura = Math.random() * (40 - 35) + 35;
+        const oxigenacion = Math.random() * (100 - 95) + 95;
+        const ritmo = Math.random() * (100 - 60) + 60;
+
+        tempElement.textContent = `${temperatura.toFixed(1)} °C`;
+        oxigenacionElement.textContent = `${oxigenacion.toFixed(1)} %`;
+        ritmoElement.textContent = `${ritmo.toFixed(0)} bpm`;
+
+        if (temperatura >= 38) {
+          tempElement.classList.add("calor");
+          tempElement.classList.remove("frio");
+        } else if (temperatura <= 36) {
+          tempElement.classList.add("frio");
+          tempElement.classList.remove("calor");
+        } else {
+          tempElement.classList.remove("calor", "frio");
+        }
+      }
+
+      setInterval(updateSensors, 1000);
+
+      function showTable() {
+        document.getElementById("led-control").style.display = "none";
+        document.getElementById("info-control").style.display = "none";
+        document.getElementById("table-container").style.display = "block";
+
+        fetchRecords();
+      }
+
+      function hideTable() {
+        document.getElementById("table-container").style.display = "none";
+        document.getElementById("led-control").style.display = "block";
+        document.getElementById("info-control").style.display = "block";
+      }
+
+      function fetchRecords() {
+        // Reemplaza la URL con la de tu servidor que devuelve los registros
+        const url = "http://192.168.1.2/";
+
+        fetch(url)
+          .then((response) => response.json())
+          .then((data) => {
+            const tableBody = document.getElementById("records-table").querySelector("tbody");
+            tableBody.innerHTML = ""; // Limpiar la tabla
+
+            data.forEach((record) => {
+              const row = document.createElement("tr");
+              row.innerHTML = `
+                <td>${record.id}</td>
+                <td>${record.date}</td>
+                <td>${record.value1}</td>
+                <td>${record.value2}</td>
+                <td>${record.value3}</td>
+              `;
+              tableBody.appendChild(row);
+            });
+          })
+          .catch((error) => console.error("Error fetching records:", error));
+      }
+    </script>
+  </body>
+</html>
