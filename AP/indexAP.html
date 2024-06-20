@@ -376,23 +376,35 @@
         const oxigenacionElement = document.getElementById("valor-oxigenacion");
         const ritmoElement = document.getElementById("valor-ritmo-cardiaco");
 
-        const temperatura = Math.random() * (40 - 35) + 35;
-        const oxigenacion = Math.random() * (100 - 95) + 95;
-        const ritmo = Math.random() * (100 - 60) + 60;
+        console.log("updating");
+        const url = `${esp32Ip}/update`;
+        fetch(url, {
+          method: "GET",
+        })
+        .then((response) => response.json()) // Parse the JSON string in the response
+        .then((data) => {
+          console.log(data); // Handle the parsed data
 
-        tempElement.textContent = `${temperatura.toFixed(1)} °C`;
-        oxigenacionElement.textContent = `${oxigenacion.toFixed(1)} %`;
-        ritmoElement.textContent = `${ritmo.toFixed(0)} bpm`;
+          const temperatura = data.temperatura;
+          const oxigenacion = data.oxigenacion;
+          const ritmo = data.pulso;
 
-        if (temperatura >= 38) {
-          tempElement.classList.add("calor");
-          tempElement.classList.remove("frio");
-        } else if (temperatura <= 36) {
-          tempElement.classList.add("frio");
-          tempElement.classList.remove("calor");
-        } else {
-          tempElement.classList.remove("calor", "frio");
-        }
+          tempElement.textContent = `${temperatura.toFixed(1)} °C`;
+          oxigenacionElement.textContent = `${oxigenacion.toFixed(1)} %`;
+          ritmoElement.textContent = `${ritmo.toFixed(0)} bpm`;
+
+          if (temperatura >= 38) {
+            tempElement.classList.add("calor");
+            tempElement.classList.remove("frio");
+          } else if (temperatura <= 36) {
+            tempElement.classList.add("frio");
+            tempElement.classList.remove("calor");
+          } else {
+            tempElement.classList.remove("calor", "frio");
+          }
+
+        })
+        .catch((error) => console.error("Error:", error));
       }
 
       setInterval(updateSensors, 1000);
