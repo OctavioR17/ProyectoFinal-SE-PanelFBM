@@ -193,28 +193,6 @@ void update() {
   
   char jsonBuffer[512];
   serializeJson(doc, jsonBuffer);
-/*
-  HTTPClient http;
-  http.begin(SERVER);
-  http.addHeader("Content-Type", "application/json");
-
-  int httpResponseCode = http.POST(jsonBuffer);
-
-  Serial.println(jsonBuffer);
-
-  
-  if(httpResponseCode>0){
-    String response = http.getString();
-    Serial.println(httpResponseCode);
-    Serial.println(response);
-  }else{
-    Serial.print("Error on sending POST: ");
-    Serial.println(httpResponseCode);
-  }
-
-  http.end();  //Free resources
-  Serial.println();
-  */
 
   server.send(200, "application/json", jsonBuffer); 
 }
