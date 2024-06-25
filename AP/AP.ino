@@ -3,40 +3,11 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
-#include "index.h"
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
 
-/* Put your SSID & Password */
-const char* ssid = "ESP32";  // Enter SSID here
-const char* password = "12345678";  //Enter Password here
-
-const char* SERVER = "http://192.168.1.2:3000/"; // cambiar
-
-/* Put IP Address details */
-IPAddress local_ip(192,168,1,1);
-IPAddress gateway(192,168,1,1);
-IPAddress subnet(255,255,255,0);
-
-WebServer server(80);
-
-// azul
-int led1 = 4;
-// verde
-int led2 = 5;
-// amarillo
-int led3 = 19;
-
-int led4 = 10;
-
-int led5 = 19;
-
-int activeLed = 0;
-
-int sensor = 2;
-OneWire oneWire(sensor);
-DallasTemperature sensors(&oneWire);
-float temperatura = 117.0;
+#include "index.h"
+#include "variables.h"
 
 void setup() {
   Serial.begin(115200);
@@ -49,16 +20,17 @@ void setup() {
 void loop() {
   sensors.requestTemperatures();
   temperatura = sensors.getTempCByIndex(0);
-  Serial.println(temperatura);
+  //Serial.println(temperatura);
   if(temperatura > 30){
-    cancelTreatment();
+    Serial.println("Temperatura alta");
+    terminarTratamiento();
   }
 
   server.handleClient();
 }
 
 void iniciarSensores() {
-  Serial.println("Iniciando sensores...");
+  Serial.println("\nIniciando sensores...");
   
   pinMode(led1, OUTPUT);
   pinMode(led2, OUTPUT);
@@ -73,29 +45,25 @@ void iniciarSensores() {
 }
 
 void iniciarServidor() {
-  Serial.println("Iniciando servidor...");
+  Serial.println("\nIniciando servidor...");
   
   WiFi.softAP(ssid, password);
   WiFi.softAPConfig(local_ip, gateway, subnet);
   delay(100);
   
   server.on("/", handle_OnConnect);
-  server.on("/button1", opcion1);
-  server.on("/button2", opcion2);
-  server.on("/button3", opcion3);
-  server.on("/button4", opcion4);
-  server.on("/button5", opcion5);
+  server.on("/tratamiento1", tratamiento1);
+  server.on("/tratamiento2", tratamiento2);
+  server.on("/tratamiento3", tratamiento3);
+  server.on("/tratamiento4", tratamiento4);
+  server.on("/tratamiento5", tratamiento5);
   server.on("/slider", slider);
-  server.on("/update", update);
-  server.on("/cancel", cancelTreatment);
-
-  //server.on("/button5", enviarDatos);
-
+  server.on("/updateSensors", updateSensors);
+  server.on("/terminarTratamiento", terminarTratamiento);
   server.onNotFound(handle_NotFound);
   
   server.begin();
-  Serial.println("HTTP server started");
-
+  Serial.println("Servidor iniciado\n");
 }
 
 void handle_OnConnect() {
@@ -103,9 +71,10 @@ void handle_OnConnect() {
   server.send(200, "text/html", SendHTML()); 
 }
 
-void opcion1() {
+void tratamiento1() {
+  tratamiento = "tratamiento1";
   activeLed = led1;
-  Serial.println("\nOpcion 1\n");
+  Serial.println("\ tratamiento 1\n");
 
   //adaptar al tratamiento adecuado
   analogWrite(led1, 30);
@@ -113,32 +82,39 @@ void opcion1() {
   server.send(200, "text/html", SendHTML()); 
 }
 
-void opcion2() {
+void tratamiento2() {
+  tratamiento = "tratamiento2";
   activeLed = led2;
-  Serial.println("\nOpcion 2\n");
+  Serial.println("\ tratamiento 2\n");
   
   analogWrite(led2, 255);
   
   server.send(200, "text/html", SendHTML()); 
 }
 
-void opcion3() {
+void tratamiento3() {
+  tratamiento = "tratamiento3";
+
   activeLed = led3;
-  Serial.println("\nOpcion 3\n");
+  Serial.println("\ tratamiento 3\n");
   analogWrite(led3, 255);
   server.send(200, "text/html", SendHTML()); 
 }
 
-void opcion4() {
+void tratamiento4() {
+  tratamiento = "tratamiento4";
+
   activeLed = led4;
-  Serial.println("\nOpcion 4\n");
+  Serial.println("\ tratamiento 4\n");
   analogWrite(led4, 255);
   server.send(200, "text/html", SendHTML()); 
 }
 
-void opcion5() {
+void tratamiento5() {
+  tratamiento = "tratamiento5";
+
   activeLed = led5;
-  Serial.println("\nOpcion 5\n");
+  Serial.println("\ tratamiento 5\n");
   analogWrite(led5, 255);
   server.send(200, "text/html", SendHTML()); 
 }
@@ -162,10 +138,11 @@ void slider() {
   server.send(200, "text/html", SendHTML()); 
 }
 
-void cancelTreatment() {
-  Serial.println("\ncanceling\n");
+void terminarTratamiento() {
+  Serial.println("\nTerminando\n");
 
   activeLed = 0;
+  tratamiento = "";
 
   analogWrite(led1, 0);
   analogWrite(led2, 0);
@@ -180,57 +157,45 @@ void handle_NotFound(){
   server.send(404, "text/plain", "Not found");
 }
 
-void update() {
+void updateSensors() {
   Serial.println("\nEnviando datos...");
 
+  String tratamiento = server.arg("tratamiento");
   StaticJsonDocument<200> doc;
 
-  doc["nombre"] = "Oktavio"; // reemplazar por el nombre del paciente
-  doc["intensidadled"] = 11; // reemplazar por la lectura del sensor
+  doc["intensidad"] = 11; // reemplazar por la lectura del sensor
+  doc["frecuencia"] = 117;
   doc["oxigenacion"] = 56.00; //// reemplazar por la lectura del sensor
   doc["pulso"] = 5.72; // reemplazar por la lectura del sensor
   doc["temperatura"] = 26.00; // reemplazar por la lectura del sensor
+  doc["tratamiento"] = tratamiento;
   
   char jsonBuffer[512];
   serializeJson(doc, jsonBuffer);
 
-  server.send(200, "application/json", jsonBuffer); 
-}
+  // para insertar en la bd ---------------
+  if(tratamiento.length() > 0){
+    HTTPClient http;
+    http.begin(SERVER);
+    http.addHeader("Content-Type", "application/json");
 
-void enviarDatos() {
-  Serial.println("\nEnviando datos...");
+    int httpResponseCode = http.POST(jsonBuffer);
 
-  StaticJsonDocument<200> doc;
+    Serial.println(jsonBuffer);
+    
+    if(httpResponseCode>0){
+      String response = http.getString();
+      Serial.println(httpResponseCode);
+      Serial.println(response);
+    }else{
+      Serial.print("Error on sending POST: ");
+      Serial.println(httpResponseCode);
+    }
 
-  doc["nombre"] = "Oktavio"; // reemplazar por el nombre del paciente
-  doc["intensidadled"] = 11; // reemplazar por la lectura del sensor
-  doc["oxigenacion"] = 0.00; //// reemplazar por la lectura del sensor
-  doc["pulso"] = 5.72; // reemplazar por la lectura del sensor
-  doc["temperatura"] = 26.00; // reemplazar por la lectura del sensor
-  
-  char jsonBuffer[512];
-  serializeJson(doc, jsonBuffer);
-
-  HTTPClient http;
-  http.begin(SERVER);
-  http.addHeader("Content-Type", "application/json");
-
-  int httpResponseCode = http.POST(jsonBuffer);
-
-  Serial.println(jsonBuffer);
-
-  
-  if(httpResponseCode>0){
-    String response = http.getString();
-    Serial.println(httpResponseCode);
-    Serial.println(response);
-  }else{
-    Serial.print("Error on sending POST: ");
-    Serial.println(httpResponseCode);
+    http.end();  //Free resources
+    Serial.println();
+    // para insertar en la bd ---------------
   }
 
-  http.end();  //Free resources
-  Serial.println();
-
-  server.send(200, "text/html", SendHTML()); 
+  server.send(200, "application/json", jsonBuffer);
 }

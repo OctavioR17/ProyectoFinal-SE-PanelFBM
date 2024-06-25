@@ -180,11 +180,11 @@
         Selecciona cualquiera de las opciones para comenzar con la sesión
       </h3>
       <div id="controls">
-        <button id="btn1" onclick="sendData('button1')">Botón 1</button>
-        <button id="btn2" onclick="sendData('button2')">Botón 2</button>
-        <button id="btn3" onclick="sendData('button3')">Botón 3</button>
-        <button id="btn4" onclick="sendData('button4')">Botón 4</button>
-        <button id="btn5" onclick="sendData('button5')">Botón 5</button>
+        <button id="op1" onclick="sendOpcion('tratamiento1')">Opcion 1</button>
+        <button id="op2" onclick="sendOpcion('tratamiento2')">Opcion 2</button>
+        <button id="op3" onclick="sendOpcion('tratamiento3')">Opcion 3</button>
+        <button id="op4" onclick="sendOpcion('tratamiento4')">Opcion 4</button>
+        <button id="op5" onclick="sendOpcion('tratamiento5')">Opcion 5</button>
       </div>
       <div id="password-container">
         <input
@@ -243,7 +243,7 @@
       </div>
       <button
         id="cancel"
-        onclick="cancelTimer()"
+        onclick="terminarTratamiento()"
         style="
           background-color: #dc3545;
           display: none;
@@ -278,10 +278,13 @@
         <thead>
           <tr>
             <th>ID</th>
-            <th>Fecha</th>
-            <th>Valor 1</th>
-            <th>Valor 2</th>
-            <th>Valor 3</th>
+            <th>Hora</th>
+            <th>Tratamiento</th>
+            <th>Intensidad</th>
+            <th>Frecuencia</th>
+            <th>Oxigenación</th>
+            <th>Pulso cardiaco</th>
+            <th>Temperatura</th>
           </tr>
         </thead>
         <tbody>
@@ -293,7 +296,9 @@
 
     <script>
       const correctPassword = "12345"; // Contraseña correcta
-      const esp32Ip = "http://192.168.1.1"; 
+      const esp32Ip = "http://192.168.1.1";
+      let sesionIniciada = false;
+      let tratamiento = "";
 
       function checkPassword() {
         const inputPassword = document.getElementById("password-input").value;
@@ -304,8 +309,14 @@
         }
       }
 
-      function sendData(button) {
-        fetch(`${esp32Ip}/${button}`, {
+      function sendOpcion(opcion) {
+        // si no confirma, termina
+        if(!confirmStart(0.2, "test")) {return};
+
+        tratamiento = opcion;
+        sesionIniciada = true;
+
+        fetch(`${esp32Ip}/${opcion}`, {
           method: "GET",
         })
           .then((response) => response.text())
@@ -334,10 +345,12 @@
       function confirmStart(duration, infoId) {
         if (confirm("¿Deseas iniciar la sesión?")) {
           startTimer(duration);
-          document.getElementById(infoId).style.display = "block";
+          //document.getElementById(infoId).style.display = "block";
           document.getElementById("cancel").style.display = "block";
           document.getElementById("message").style.display = "none";
+          return true;
         }
+        return false;
       }
 
       function startTimer(duration) {
@@ -356,19 +369,21 @@
             seconds;
           time--;
           if (time < 0) {
-            clearInterval(countdown);
-            document.getElementById("message").style.display = "block";
-            document.getElementById("timer-container").style.display = "none";
-            document.getElementById("cancel").style.display = "none";
+            terminarTratamiento();
           }
         }, 1000);
       }
 
-      function cancelTimer() {
+      function terminarTratamiento() {
+        sesionIniciada = false;
+        tratamiento = "";
+
+        fetch(`${esp32Ip}/terminarTratamiento`);
+
         clearInterval(countdown);
+        document.getElementById("message").style.display = "block";
         document.getElementById("timer-container").style.display = "none";
         document.getElementById("cancel").style.display = "none";
-        document.getElementById("message").style.display = "none";
       }
 
       function updateSensors() {
@@ -377,7 +392,13 @@
         const ritmoElement = document.getElementById("valor-ritmo-cardiaco");
 
         console.log("updating");
-        const url = `${esp32Ip}/update`;
+        const url = `${esp32Ip}/updateSensors?tratamiento=${tratamiento}`;
+
+        if(sesionIniciada){
+          console.log("insertando");
+          console.log(tratamiento);
+        }
+
         fetch(url, {
           method: "GET",
         })
@@ -402,7 +423,6 @@
           } else {
             tempElement.classList.remove("calor", "frio");
           }
-
         })
         .catch((error) => console.error("Error:", error));
       }
@@ -425,7 +445,7 @@
 
       function fetchRecords() {
         // Reemplaza la URL con la de tu servidor que devuelve los registros
-        const url = "http://192.168.1.2/";
+        const url = "http://192.168.1.2:3000";
 
         fetch(url)
           .then((response) => response.json())
@@ -437,10 +457,13 @@
               const row = document.createElement("tr");
               row.innerHTML = `
                 <td>${record.id}</td>
-                <td>${record.date}</td>
-                <td>${record.value1}</td>
-                <td>${record.value2}</td>
-                <td>${record.value3}</td>
+                <td>${record.hora}</td>
+                <td>${record.tratamiento}</td>
+                <td>${record.intensidad}</td>
+                <td>${record.frecuencia}</td>
+                <td>${record.oxigenacion}</td>
+                <td>${record.pulso}</td>
+                <td>${record.temperatura}</td>
               `;
               tableBody.appendChild(row);
             });
