@@ -3,4 +3,6 @@
 
 ---
 Links útiles:
-Código HTML a C (para el access point): https://www.hs2t.com/p/html-to-c-string.html
+Código HTML a C (para el access point):
+
+https://www.hs2t.com/p/html-to-c-string.html

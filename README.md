@@ -1,6 +1,12 @@
 # ProyectoFinal-SE-PanelFBM
 ## Diagrama del proyecto
-![diagrama](./diagrama.png)
+![diagrama](./images/diagrama.png)
+
+## Videos utiles
+1. [Expliacion del diagrama](https://alumnouaemex-my.sharepoint.com/:v:/g/personal/cgarciad004_alumno_uaemex_mx/Ecu0kwUJl0BFo6o186qQ4oYBGm8ErJ-keohtenUZnSEWNg?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=3CqVlC)
+2. [Demo del funcionamiento](https://alumnouaemex-my.sharepoint.com/:v:/g/personal/cgarciad004_alumno_uaemex_mx/ETtt0hgwZLpAoNxdMdP50NABEy6wX2TlezmW6F_Ml8QEaQ?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=UsrxYh)
+3. [Demo del funcionamiento - tabla](https://alumnouaemex-my.sharepoint.com/:v:/g/personal/cgarciad004_alumno_uaemex_mx/EZfnKVd-6KBIpW_RqF_ulZQB5DlsLhBihT9kSmdXWHN6JQ?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=782KcW)
+4. [Expliacion del codigo](https://alumnouaemex-my.sharepoint.com/:v:/g/personal/cgarciad004_alumno_uaemex_mx/ERfGx75uP4JApDEM1skHZN0BiiDiC_dm91jC7_ZtB3JV7A?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=n3sYP2)
 
 ## Requisitos
 - **Base de datos**: PostgreSQL
@@ -36,7 +42,7 @@
 
     - O descarga el proyecto como ZIP
 
-        ![alt text](repo.png)
+        ![alt text](./images/repo.png)
 
 2. **Crea la tabla en PostgreSQL**
 
@@ -48,7 +54,7 @@
 
     Ejemplo del circuito:
 
-    ![alt text](circuito.jpg)
+    ![alt text](./images/circuito.jpg)
 
 4. **Conecta la laptop al Access Point del Esp32**
 
