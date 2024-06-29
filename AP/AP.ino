@@ -21,8 +21,9 @@ void loop() {
   sensors.requestTemperatures();
   temperatura = sensors.getTempCByIndex(0);
   //Serial.println(temperatura);
-  if(temperatura > 30){
-    Serial.println("Temperatura alta");
+  if(temperatura > 30 || digitalRead(pinEmergencia) == HIGH){
+    //Serial.println("Temperatura alta");
+    Serial.println("*******\n Emergencia \n*******");
     terminarTratamiento();
   }
 
@@ -31,13 +32,16 @@ void loop() {
 
 void iniciarSensores() {
   Serial.println("\nIniciando sensores...");
-  
+  /*
   pinMode(led1, OUTPUT);
   pinMode(led2, OUTPUT);
   pinMode(led3, OUTPUT);
   pinMode(led4, OUTPUT);
   pinMode(led5, OUTPUT);
+  */
 
+  pinMode(ledInfrarrojo, OUTPUT);
+  pinMode(pinEmergencia, INPUT);
   sensors.requestTemperatures();
   temperatura = sensors.getTempCByIndex(0);
 
@@ -73,67 +77,70 @@ void handle_OnConnect() {
 
 void tratamiento1() {
   tratamiento = "tratamiento1";
-  activeLed = led1;
+  //activeLed = led1;
   Serial.println("\ tratamiento 1\n");
-
+  intensidad = 50;
   //adaptar al tratamiento adecuado
-  analogWrite(led1, 30);
+  analogWrite(ledInfrarrojo, intensidad);
 
   server.send(200, "text/html", SendHTML()); 
 }
 
 void tratamiento2() {
   tratamiento = "tratamiento2";
-  activeLed = led2;
+  //activeLed = led2;
   Serial.println("\ tratamiento 2\n");
-  
-  analogWrite(led2, 255);
+  intensidad = 100;
+  analogWrite(ledInfrarrojo, intensidad);
   
   server.send(200, "text/html", SendHTML()); 
 }
 
 void tratamiento3() {
   tratamiento = "tratamiento3";
+  //activeLed = led3;
 
-  activeLed = led3;
   Serial.println("\ tratamiento 3\n");
-  analogWrite(led3, 255);
+  intensidad = 150;
+  analogWrite(ledInfrarrojo, intensidad);
   server.send(200, "text/html", SendHTML()); 
 }
 
 void tratamiento4() {
   tratamiento = "tratamiento4";
+  //activeLed = led4;
 
-  activeLed = led4;
   Serial.println("\ tratamiento 4\n");
-  analogWrite(led4, 255);
+  intensidad = 200;
+  analogWrite(ledInfrarrojo, intensidad);
   server.send(200, "text/html", SendHTML()); 
 }
 
 void tratamiento5() {
   tratamiento = "tratamiento5";
+  //activeLed = led5;
 
-  activeLed = led5;
   Serial.println("\ tratamiento 5\n");
-  analogWrite(led5, 255);
+  intensidad = 250;
+  analogWrite(ledInfrarrojo, intensidad);
   server.send(200, "text/html", SendHTML()); 
 }
 
 void slider() {
   Serial.println("\nSlider\n");
 
-  int intensity = server.arg("intensity").toInt();
-  int duration = server.arg("duration").toInt();
-  int frequency = server.arg("frequency").toInt();
+  intensidad = server.arg("intensity").toInt();
+  //int duration = server.arg("duration").toInt();
+  frecuencia = server.arg("frequency").toInt();
 
-  Serial.println(intensity);
-  Serial.println(duration);
-  Serial.println(frequency);
+  Serial.println(intensidad);
+  //Serial.println(duration);
+  Serial.println(frecuencia);
 
-  analogWrite(activeLed, intensity);
+  analogWrite(ledInfrarrojo, intensidad);
 
-  Serial.print("Led: "); Serial.print(activeLed); 
-  Serial.print(", intensity: "); Serial.println(intensity);
+  Serial.print("Led: "); Serial.print(ledInfrarrojo); 
+  Serial.print(", intensidad: "); Serial.println(intensidad);
 
   server.send(200, "text/html", SendHTML()); 
 }
@@ -141,14 +148,18 @@ void slider() {
 void terminarTratamiento() {
   Serial.println("\nTerminando\n");
 
-  activeLed = 0;
+  //activeLed = 0;
   tratamiento = "";
+  intensidad = 0;
+  analogWrite(ledInfrarrojo, intensidad);
 
+  /*
   analogWrite(led1, 0);
   analogWrite(led2, 0);
   analogWrite(led3, 0);
   analogWrite(led4, 0);
   analogWrite(led5, 0);
+  */
 
   server.send(200, "text/html", SendHTML()); 
 }
@@ -163,7 +174,7 @@ void updateSensors() {
   String tratamiento = server.arg("tratamiento");
   StaticJsonDocument<200> doc;
 
-  doc["intensidad"] = 11; // reemplazar por la lectura del sensor
+  doc["intensidad"] = intensidad; // reemplazar por la lectura del sensor
   doc["frecuencia"] = 117;
   doc["oxigenacion"] = 56.00; //// reemplazar por la lectura del sensor
   doc["pulso"] = 5.72; // reemplazar por la lectura del sensor
@@ -194,8 +205,8 @@ void updateSensors() {
 
     http.end();  //Free resources
     Serial.println();
-    // para insertar en la bd ---------------
   }
+  // para insertar en la bd ---------------
 
   server.send(200, "application/json", jsonBuffer);
 }

@@ -13,16 +13,20 @@ WebServer server(80);
 
 String tratamiento = "";
 
-// azul
-int led1 = 4;
-// verde
-int led2 = 5;
-// amarillo
-int led3 = 19;
-
-int led4 = 10;
-
-int led5 = 19;
+// sensore de temperatura
+int pinSensorTemperatura = 0;
+// sensor de oxigenacion
+int pinSensorOxigenacion = 0;
+// sensor de ritmo cardiaco
+int pinSensorRitmo = 0;
+// led infrarrojo
+int ledInfrarrojo = 4;
+// intensidad
+int intensidad = 0;
+// frecuencia
+float frecuencia = 0;
+// boton de emergencia
+int pinEmergencia = 19;
 
 int activeLed = 0;
 
